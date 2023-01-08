@@ -1,30 +1,21 @@
 /* Jenkinsfile (Declarative Pipeline) */
 pipeline {
-    agent any
-    stages {
-        stage('Test') {
-            steps {
-                sh 'echo "Fail!"; exit 1'
-            }
-        }
+    agent {
+        label '!windows'
     }
-    /* Kind of like 'finally' */
-    post {
-        always {
-            echo 'This will alwasy run'
-        }
-        success {
-            echo 'This will only run if the stages executed successfully.'
-        }
-        failure {
-            echo 'This will only run when at least one of the stages failed.'
-        }
-        unstable {
-            echo 'This will only run if the run was marked as unstable.'
-        }
-        changed {
-            echo 'This will run only if the state of the Pipeline has changed.'
-            echo 'For example, if the Pipeline was previously failing but now succeeds.'
+
+    environment {
+        DISABLE_AUTH = 'true'
+        DB_ENGINE    = 'sqlite'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                echo "Database engine is ${DB_ENGINE}"
+                echo "DISABLE_AUTH is ${DISABLE_AUTH}"
+                sh 'printenv'
+            }
         }
     }
 }
