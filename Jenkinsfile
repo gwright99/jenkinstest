@@ -12,7 +12,7 @@ pipeline {
                     sh './health-check.sh'
                 }
             }
-        },
+        }
         stage('NestedWrappers') {
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
