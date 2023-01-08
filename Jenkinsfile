@@ -1,54 +1,48 @@
 /* Jenkinsfile (Declarative Pipeline) */
 pipeline {
     agent any
+    options {
+        skipStagesAfterUnstable()
+    }
     stages {
-        stage('Test') {
+        stage('Build') {
             steps {
-                sh 'echo "Fail!"; exit 1'
+                echo 'Building'
             }
         }
-    }
-    /* Kind of like 'finally' */
-    post {
-        always {
-            echo 'This will alwasy run'
-            /* This can be used for stuff like assembling the results of all tests run during the pipeline execution lifetime.
-            See: https://www.jenkins.io/doc/pipeline/tour/tests-and-artifacts/ */
+        stage('Test') {
+            steps {
+                echo 'Testing'
+            }
         }
-        success {
-            echo 'This will only run if the stages executed successfully.'
-
-            /* Notification example:
-            slackSend channel: '#ops-room',
-                  color: 'good',
-                  message: "The pipeline ${currentBuild.fullDisplayName} completed successfully." */
+        stage('Deploy') {
+            steps {
+                echo 'Deploying'
+            }
         }
-        failure {
-            echo 'This will only run when at least one of the stages failed.'
-
-            /* Notification example:
-            mail to: 'team@example.com',
-                subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-                body: "Something is wrong with ${env.BUILD_URL}"
-
-            OR
-
-            hipchatSend message: "Attention @here ${env.JOB_NAME} #${env.BUILD_NUMBER} has failed.",
-                color: 'RED' */
+        /* Get human input before continuing on to something more dangerous like deploying to a higher environment */
+        stage('Sanity check') {
+            steps {
+                input "Does the staging environment look ok?"
+            }
         }
-        unstable {
-            echo 'This will only run if the run was marked as unstable.'
-
-            /* A pipeline that has failing tests will be marked UNSTABLE.
-            Pipeline execution will by default proceed even when the build is unstable. 
-
-            As per: https://www.jenkins.io/doc/pipeline/tour/tests-and-artifacts/
-            To skip deployment after test failures in Declarative syntax, use the skipStagesAfterUnstable option. 
-            In Scripted syntax, you may check currentBuild.currentResult == 'SUCCESS'. */
+        /* 
+        https://www.jenkins.io/doc/pipeline/tour/deployment/
+        One common pattern is to extend the number of stages to capture additional deployment environments, like "staging" or "production".
+        This kind of pipeline that automatically deploys code all the way through to production can be considered an implementation of "continuous deployment." 
+        While this is a noble ideal, for many there are good reasons why continuous deployment might not be practical, but those can still enjoy the 
+        benefits of continuous delivery.
+        */
+        stage('Deploy - Staging') {
+            steps {
+                sh './deploy staging'
+                sh './run-smoke-tests'
+            }
         }
-        changed {
-            echo 'This will run only if the state of the Pipeline has changed.'
-            echo 'For example, if the Pipeline was previously failing but now succeeds.'
+        stage('Deploy - Production') {
+            steps {
+                sh './deploy production'
+            }
         }
     }
 }
