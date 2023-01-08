@@ -16,7 +16,7 @@ pipeline {
         success {
             echo 'This will only run if the stages executed successfully.'
         }
-        fail {
+        failure {
             echo 'This will only run when at least one of the stages failed.'
         }
         unstable {
