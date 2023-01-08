@@ -1,0 +1,9 @@
+# Introduction
+
+Based on "How to Push a Docker Image to Docker Hub Using Jenkins" Youtube video by Daring Pope, Developer Advocate at CloudBees.
+
+Links:
+    - Youtube: [https://www.youtube.com/watch?v=alQQ84M4CYU](https://www.youtube.com/watch?v=alQQ84M4CYU)
+    - Github: [https://github.com/darinpope/dockerhub-example/tree/01-no-plugins-necessary](https://github.com/darinpope/dockerhub-example/tree/01-no-plugins-necessary)
+
+
